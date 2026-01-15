@@ -1,0 +1,9 @@
+-- CreateTable
+CREATE TABLE "Entry" (
+    "id" TEXT NOT NULL,
+    "label" TEXT,
+    "content" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Entry_pkey" PRIMARY KEY ("id")
+);

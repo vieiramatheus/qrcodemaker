@@ -1,11 +1,11 @@
 # QR Information Maker
 
-A Next.js application that lets you store text-based information, persist it with SQLite via Prisma, and instantly generate QR codes that point to hosted detail pages for each entry.
+A Next.js application that lets you store text-based information, persist it with PostgreSQL via Prisma, and instantly generate QR codes that point to hosted detail pages for each entry.
 
 ## Features
 
 - Save any snippet of text with an optional title
-- Persist entries with Prisma on a local SQLite database
+- Persist entries with Prisma on Neon-hosted PostgreSQL databases
 - Auto-generate QR codes that resolve to shareable `/info/{id}` pages
 - Browse saved entries with inline QR previews and download links
 - Responsive Tailwind CSS interface optimized for desktop and mobile
@@ -14,7 +14,7 @@ A Next.js application that lets you store text-based information, persist it wit
 
 - [Next.js 14](https://nextjs.org/) with the App Router
 - [React 18](https://react.dev/)
-- [Prisma](https://www.prisma.io/) + SQLite
+- [Prisma](https://www.prisma.io/) + PostgreSQL (Neon)
 - [Tailwind CSS 3](https://tailwindcss.com/)
 - [qrcode](https://github.com/soldair/node-qrcode) for QR image generation
 
@@ -25,19 +25,24 @@ A Next.js application that lets you store text-based information, persist it wit
 
 ## Setup
 
-1. Install dependencies:
+1. Populate `.env` with your Neon **development** connection string (and optional `SHADOW_DATABASE_URL` for Prisma Migrate). Sample values:
+   ```dotenv
+   DATABASE_URL="postgresql://<dev-user>:<dev-password>@<dev-host>/<dev-database>?sslmode=require"
+   SHADOW_DATABASE_URL="postgresql://<shadow-user>:<shadow-password>@<shadow-host>/<shadow-database>?sslmode=require"
+   ```
+2. Install dependencies (this also runs `prisma generate` via the postinstall hook):
    ```bash
    npm install
    ```
-2. Generate the SQLite schema and client:
+3. Apply migrations to your development database:
    ```bash
-   npx prisma migrate dev --name init
+   npx prisma migrate dev --name dev-bootstrap
    ```
-3. Start the development server:
+4. Start the development server:
    ```bash
    npm run dev
    ```
-4. Visit http://localhost:3000 to use the app.
+5. Visit http://localhost:3000 to use the app.
 
 ## Available Scripts
 
@@ -50,13 +55,10 @@ A Next.js application that lets you store text-based information, persist it wit
 
 ## Environment
 
-The app uses a local SQLite database by default, configured via the `.env` file:
+- `.env` – development database credentials (Neon dev branch) plus optional `SHADOW_DATABASE_URL` for migrations.
+- `.env.production` – production database credentials (Neon production branch). This file is ignored by git; set the same value in Vercel project settings before deploying.
 
-```
-DATABASE_URL="file:./prisma/dev.db"
-```
-
-Update this variable if you plan to use a different database provider.
+Production deployments should run `npx prisma migrate deploy` once after setting `DATABASE_URL` to ensure the schema is fully applied.
 
 ## Project Structure
 
